@@ -82,6 +82,8 @@ public:
     }
     return c;
   }
+
+  int capacity() { return m_size; }
 };
 
 int main() { return 0; }

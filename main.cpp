@@ -29,7 +29,7 @@ public:
 
   bool contains(std::string_view key) const {
     int index = hash(key);
-    for (auto &pair : m_table[index]) {
+    for (const auto &pair : m_table[index]) {
       if (pair.first == key) {
         return true;
       }
@@ -64,7 +64,7 @@ public:
     std::cout << "Didn't erase anything. No matching key.\n";
   }
 
-  Entity *get(std::string_view key) {
+  const Entity *get(std::string_view key) const {
     int index{hash(key)};
     auto &bucket{m_table[index]};
     for (auto i{bucket.begin()}; i != bucket.end(); ++i) {
@@ -75,15 +75,17 @@ public:
     return nullptr;
   }
 
-  int size() {
+  int size() const {
     int c{0};
-    for (auto i : m_table) {
+    for (const auto &i : m_table) {
       c += i.size();
     }
     return c;
   }
 
-  int capacity() { return m_size; }
+  int capacity() const { return m_size; }
+
+  bool isEmpty() const { return size() == 0; }
 };
 
 int main() { return 0; }

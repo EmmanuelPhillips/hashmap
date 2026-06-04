@@ -63,6 +63,17 @@ public:
     }
     std::cout << "Didn't erase anything. No matching key.\n";
   }
+
+  Entity *get(std::string_view key) {
+    int index{hash(key)};
+    auto &bucket{m_table[index]};
+    for (auto i{bucket.begin()}; i != bucket.end(); ++i) {
+      if (i->first == key) {
+        return &i->second;
+      }
+    }
+    return nullptr;
+  }
 };
 
 int main() { return 0; }

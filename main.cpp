@@ -14,22 +14,23 @@ struct Entity {
 
 class Hashmap {
 private:
-  const int m_size{10};
+  int m_size{10};
   std::vector<std::list<std::pair<std::string, Entity>>> m_table;
 
 public:
   Hashmap() : m_table(m_size) {}
+  Hashmap(int capacity) : m_size{capacity}, m_table(m_size) {}
 
-  int hash(std::string_view key) const {
+  int hash(std::string_view key, int size) const {
     int sum{0};
     for (char c : key) {
       sum += c;
     }
-    return sum % m_size;
+    return sum % size;
   }
 
   bool contains(std::string_view key) const {
-    int index = hash(key);
+    int index = hash(key, m_size);
     for (const auto &pair : m_table[index]) {
       if (pair.first == key) {
         return true;
@@ -39,7 +40,7 @@ public:
   }
 
   void insert(std::string_view key, const Entity &value) {
-    int index{hash(key)};
+    int index{hash(key, m_size)};
     auto &bucket{m_table[index]};
     for (auto &pair : bucket) {
       if (pair.first == key) {
@@ -53,7 +54,7 @@ public:
   }
 
   void remove(std::string_view key) {
-    int index{hash(key)};
+    int index{hash(key, m_size)};
     auto &bucket{m_table[index]};
 
     for (auto i{bucket.begin()}; i != bucket.end(); ++i) {
@@ -66,7 +67,7 @@ public:
   }
 
   const Entity *get(std::string_view key) const {
-    int index{hash(key)};
+    int index{hash(key, m_size)};
     auto &bucket{m_table[index]};
     for (auto i{bucket.begin()}; i != bucket.end(); ++i) {
       if (i->first == key) {
@@ -77,7 +78,7 @@ public:
   }
 
   Entity *get(std::string_view key) {
-    int index{hash(key)};
+    int index{hash(key, m_size)};
     auto &bucket{m_table[index]};
     for (auto i{bucket.begin()}; i != bucket.end(); ++i) {
       if (i->first == key) {
@@ -104,6 +105,24 @@ public:
       insert(key, Entity{});
     }
     return *get(key);
+  }
+
+  double load_factor() const {
+    return capacity() > 0
+               ? static_cast<double>(size()) / static_cast<double>(capacity())
+               : 0.00;
+  }
+
+  void rehash(int newCapacity) {
+    std::vector<std::list<std::pair<std::string, Entity>>> temp(newCapacity);
+    for (auto &bucket : m_table) {
+      for (auto &pair : bucket) {
+        int newIndex{hash(pair.first, newCapacity)};
+        temp[newIndex].emplace_back(pair);
+      }
+    }
+    m_table = temp;
+    m_size = newCapacity;
   }
 };
 

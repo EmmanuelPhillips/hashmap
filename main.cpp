@@ -74,6 +74,14 @@ public:
     }
     return nullptr;
   }
+
+  int size() {
+    int c{0};
+    for (auto i : m_table) {
+      c += i.size();
+    }
+    return c;
+  }
 };
 
 int main() { return 0; }

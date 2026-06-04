@@ -9,6 +9,7 @@ struct Entity {
   std::string email;
 
   Entity(int a, std::string_view e) : age{a}, email{e} {}
+  Entity() : age{0}, email{""} {}
 };
 
 class Hashmap {
@@ -75,6 +76,17 @@ public:
     return nullptr;
   }
 
+  Entity *get(std::string_view key) {
+    int index{hash(key)};
+    auto &bucket{m_table[index]};
+    for (auto i{bucket.begin()}; i != bucket.end(); ++i) {
+      if (i->first == key) {
+        return &i->second;
+      }
+    }
+    return nullptr;
+  }
+
   int size() const {
     int c{0};
     for (const auto &i : m_table) {
@@ -86,6 +98,13 @@ public:
   int capacity() const { return m_size; }
 
   bool isEmpty() const { return size() == 0; }
+
+  Entity &operator[](std::string_view key) {
+    if (!contains(key)) {
+      insert(key, Entity{});
+    }
+    return *get(key);
+  }
 };
 
 int main() { return 0; }
